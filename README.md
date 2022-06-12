@@ -22,4 +22,10 @@
 ;install https://github.com/schollz/colorwheel-marimba
 ```
 
-5. restart norns
+5. open maiden and enter:
+
+```
+;install https://github.com/schollz/marimba
+```
+
+6. restart norns

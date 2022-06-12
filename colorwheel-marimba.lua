@@ -16,6 +16,7 @@ write_preset = 0
 change_preset = 0
 
 g = grid.connect()
+engine.name="MarimbaMxSamples"
 
 function init()
   pset_seq.init()

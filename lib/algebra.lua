@@ -252,6 +252,7 @@ end
 
 function play(note, vel, length, channel, track, flourish)
   if flourish or (math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 ) then
+    do_marimba(note, vel, length, channel, track, flourish)
     notes.play[params:get("output "..track)](note, vel, length, channel, track)
     --print(note, vel, channel)
     end
@@ -267,4 +268,76 @@ function offset_flourish(track)
   previous_offset[track] = params:get('offset ' ..track)
   determine_traits(track, true)
   grid_dirty = true
+end
+
+local last_note_consecutive=0
+local last_note_beat=0
+local last_note_data={}
+local last_played=0
+local chord_on=false
+local chord_data={}
+
+function do_marimba(note, vel, length, channel, track, flourish)
+  engine.play(channel,note-24,vel)
+
+  -- sample and hold everytime three notes gate at the same time
+  -- use the sampled notes to play chords with mx.samples
+  local current_beat=clock.get_beats()
+  last_note_data[track]={t=current_beat,note=note,vel=vel,track=track,channel=channel}
+  if current_beat-last_note_beat<0.1 and current_beat-last_played>(chord_on and 24 or 12) then 
+    last_note_consecutive=last_note_consecutive+1
+    if last_note_consecutive>2 then 
+      last_note_consecutive=0
+      chord_on=not chord_on
+      if not chord_on then 
+        if next(chord_data)~=nil then 
+          for _,v in pairs(chord_data) do 
+            engine.mx_note_off("/home/we/dust/audio/mx.samples/string_spurs",v.note)
+          end
+        end
+      end
+      chord_data={}
+
+      if chord_on then
+        last_played=current_beat 
+        for ch,v in pairs(last_note_data) do 
+          local dat={
+            amp=1.0,
+            pan=math.random(-50,50)/100,
+            attack=8,
+            decay=2,
+            sustain=0.5,
+            release=10,
+            delaysend=0,
+            reverbsend=0.5,
+            lpf=18000,
+            lpfrq=0.707,
+            hpf=10,
+            hpfrq=0.707,
+          }
+          chord_data[ch]=v
+          tab.print(v)
+          engine.mx_note_onfx("/home/we/dust/audio/mx.samples/string_spurs",
+            v.note-12,
+            v.vel,
+            dat.amp,
+            dat.pan,
+            dat.attack,
+            dat.decay,
+            dat.sustain,
+            dat.release,
+            dat.delaysend,
+            dat.reverbsend,
+            dat.lpf,
+            dat.lpfrq,
+            dat.hpf,
+            dat.hpfrq
+          )
+        end
+      end
+    end
+  else
+    last_note_consecutive=0
+  end
+  last_note_beat=current_beat
 end

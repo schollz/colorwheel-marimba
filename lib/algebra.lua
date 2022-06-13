@@ -276,6 +276,7 @@ local last_note_data={}
 local last_played=0
 local chord_on=false
 local chord_data={}
+local bass_note=nil
 
 function do_marimba(note, vel, length, channel, track, flourish)
   engine.play(channel,note-24,vel)
@@ -292,7 +293,7 @@ function do_marimba(note, vel, length, channel, track, flourish)
       if not chord_on then 
         if next(chord_data)~=nil then 
           for _,v in pairs(chord_data) do 
-            engine.mx_note_off("/home/we/dust/audio/mx.samples/string_spurs",v.note)
+            engine.mx_note_off("/home/we/dust/audio/mx.samples/string_spurs",v.note-12)
           end
         end
       end

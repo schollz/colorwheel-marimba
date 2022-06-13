@@ -95,6 +95,10 @@ for i = 1,4,1 do
     end
 end
 
+
+  for i=1,64 do
+    randomize()
+  end
 end
 
 function grid_redraw_clock()
@@ -283,15 +287,26 @@ end
 function randomize()
   for i = 1,4,1 do
     for key,value in pairs(note_traits.current) do
+      if math.random(1,20)==1 then
       params:set(key.. " sequence end " ..i, math.random(1,16))
+      end
     end
 
   for j = 1,16,1 do
+      if math.random(1,20)==1 then
       params:set("gate " ..i .." "..j, math.random(0,1))
+      end
+      if math.random(1,20)==1 then
       params:set("interval " ..i .." "..j, math.random (1, 5))
+      end
+      if math.random(1,20)==1 then
       params:set("velocity " ..i .." "..j, math.random(2, 5))
+      end
+      if math.random(1,20)==1 then
       params:set("length " ..i .." "..j, math.random(1,5))
+      end
   end  
+      --if math.random(1,20)==1 then
       params:set("gate " ..i .." 1", 1)
 
   end

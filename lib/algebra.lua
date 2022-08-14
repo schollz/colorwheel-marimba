@@ -251,10 +251,25 @@ function check_step_probability(track)
 end
 
 function play(note, vel, length, channel, track, flourish)
+    if math.random(1,1000)<50 then 
+	    print("randomize")
+	    randomize()
+	    params:set("clock_tempo",math.random(3,16))
+    end
   if flourish or (math.random(1, 100) <= params:get('probability ' ..track) and params:get("track active " ..track) >= 1 ) then
-    do_marimba(note, vel, length, channel, track, flourish)
-    notes.play[params:get("output "..track)](note, vel, length, channel, track)
-    --print(note, vel, channel)
+    --do_marimba(note, vel, length, channel, track, flourish)
+    --notes.play[params:get("output "..track)](note, vel, length, channel, track)
+    print(note, vel, channel)
+    if track==1 or track==3 then 
+    crow.output[track].volts=(note-(track==3 and 48 or 12))/12
+    end
+    if math.random(1,100)<30 then
+	    print("slewing")
+	    crow.output[2].slew=0.94
+	crow.output[2].volts=math.random(0,500)/100
+	crow.output[4].slew=2
+	crow.output[4].volts=math.random(0,500)/100
+    end
     end
     clock.run(note_off, note, vel, length, channel, track)
   end
@@ -279,7 +294,7 @@ local chord_data={}
 local bass_note=nil
 
 function do_marimba(note, vel, length, channel, track, flourish)
-  engine.play(channel,note-24,vel)
+  --engine.play(channel,note-24,vel)
 
   -- sample and hold everytime three notes gate at the same time
   -- use the sampled notes to play chords with mx.samples
